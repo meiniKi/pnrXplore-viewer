@@ -40,7 +40,7 @@ st.selectbox(
 )
 
 if st.button("Analyze"):
-    st.session_state["manger_uploaded_root"] = "/home/user/Documents/repos/pnrXplore/archives/run"
+    st.session_state["manger_uploaded_root"] = "/home/user/Documents/repos/pnrXplore-viewer/archives/run"
     st.rerun()
 
     #if uploaded_archive is not None:

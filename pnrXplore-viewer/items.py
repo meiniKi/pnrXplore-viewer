@@ -3,10 +3,10 @@ from typing import Dict
 import streamlit as st
 from pathlib import PosixPath
 from streamlit_elements import elements, mui, nivo, html, media
-from page_helper import PageHelper
+from helper import Helper
 from pydoc import locate
 
-class PageEvalItems:
+class Items:
     @staticmethod
     def PnrXploreControlSliderSelect(item: Dict):
         st.select_slider(
@@ -39,7 +39,7 @@ class PageEvalItems:
             with mui.Typography:
                 html.img(
                     src="data:image/png;base64,{}".format(
-                            PageHelper.image_path_to_base64(
+                            Helper.image_path_to_base64(
                                 page_root/(item["item_content"]["relpath_template"] % vals))),
                     style={'width': '100%',
                            'height': 'auto',

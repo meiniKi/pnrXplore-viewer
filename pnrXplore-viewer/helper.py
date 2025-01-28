@@ -2,7 +2,7 @@
 import streamlit as st
 import base64
 
-class PageHelper:
+class Helper:
     @staticmethod
     def image_path_to_base64(image_path):
         try:

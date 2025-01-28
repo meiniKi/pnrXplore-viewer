@@ -1,13 +1,14 @@
 
 from pathlib import PosixPath, Path
 from streamlit_elements import elements, dashboard
+from streamlit_ace import st_ace
 from typing import Dict, List
 import streamlit as st
 import json
-from page_eval_items import PageEvalItems, media
-from page_helper import PageHelper
+from items import Items, media
+from helper import Helper
 
-class PageEvalGenerator:
+class Factory:
 
     @staticmethod
     def __load_page_data(data_key: str, path: PosixPath):
@@ -20,9 +21,9 @@ class PageEvalGenerator:
         for i, ele in enumerate(elements):
             with cols[i]:
                 if ele["type"] == "PnrXploreControlSliderSelect":
-                    PageEvalItems.PnrXploreControlSliderSelect(ele)
+                    Items.PnrXploreControlSliderSelect(ele)
                 if ele["type"] == "PnrXploreControlBoxSelect":
-                    PageEvalItems.PnrXploreControlBoxSelect(ele)
+                    Items.PnrXploreControlBoxSelect(ele)
             # TODO: Add further control components here
         
     def __generate_dashboard(items: List, page_root: PosixPath, page_generate_key:str):
@@ -31,11 +32,11 @@ class PageEvalGenerator:
             with dashboard.Grid(layout):
                 for i in items:
                     if i["item_type"] == "PnrXploreDashLine":
-                       PageEvalItems.PnrXploreDashLine(i)
+                       Items.PnrXploreDashLine(i)
                     if i["item_type"] == "PnrXploreDashStateImage":
-                       PageEvalItems.PnrXploreDashStateImage(i, page_root)
+                       Items.PnrXploreDashStateImage(i, page_root)
                     if i["item_type"] == "PnrXploreDashVideo":
-                       PageEvalItems.PnrXploreDashVideo(i, page_root)
+                       Items.PnrXploreDashVideo(i, page_root)
 
     @staticmethod
     def __generate_video_select(items: List, page_root: PosixPath, page_generate_key:str):
@@ -46,7 +47,7 @@ class PageEvalGenerator:
             key=k
         )
         #with mui.Paper(key=item["key"]):
-        video_data = PageHelper.image_path_to_base64(page_root/items[0][st.session_state[k]])
+        video_data = Helper.image_path_to_base64(page_root/items[0][st.session_state[k]])
         with elements("{}_player".format(page_root.name)):
             media.Player(
                 url="data:video/mpeg;base64," + video_data,
@@ -62,7 +63,7 @@ class PageEvalGenerator:
         data_key = f"{page_generate_key}_data"
         if not page_generate_key in st.session_state:
             st.session_state.page_generate_key = True
-            PageEvalGenerator.__load_page_data(data_key, page_root/"data.json")
+            Factory.__load_page_data(data_key, page_root/"data.json")
 
         data = st.session_state.data_key
 
@@ -76,8 +77,8 @@ class PageEvalGenerator:
 
         elements_dict = data["elements"]
         if "controls" in elements_dict:
-            PageEvalGenerator.__generate_controls(elements_dict["controls"], page_root, page_generate_key)
+            Factory.__generate_controls(elements_dict["controls"], page_root, page_generate_key)
         if "dashboard" in elements_dict:
-            PageEvalGenerator.__generate_dashboard(elements_dict["dashboard"], page_root, page_generate_key)
+            Factory.__generate_dashboard(elements_dict["dashboard"], page_root, page_generate_key)
         if "video_select" in elements_dict:
-            PageEvalGenerator.__generate_video_select(elements_dict["video_select"], page_root, page_generate_key)
+            Factory.__generate_video_select(elements_dict["video_select"], page_root, page_generate_key)

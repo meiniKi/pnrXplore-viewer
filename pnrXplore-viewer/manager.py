@@ -5,7 +5,7 @@ import shutil
 import tempfile
 from pathlib import Path, PosixPath
 import streamlit as st
-from page_eval_generator import PageEvalGenerator
+from factory import Factory
 
 class Manager:
     def __init__(self) -> None:
@@ -30,11 +30,12 @@ class Manager:
                      st.Page(page="page_reset.py", title="Reset", icon="⏏️", url_path="pg_reset")]
             for p in st.session_state.get("manger_pages_dict", []):
                 pages.append(st.Page(
-                    page=PageEvalGenerator.generate,
+                    page=Factory.generate,
                     title=p["title"],
                     url_path=p["key"],
                     default=False
                 ))
+            pages.append(st.Page("page_interactive.py", title="Interactive", icon="💻"))
         else:
             pages = [st.Page("page_upload.py")]
         st.session_state.pages_generated = pages
