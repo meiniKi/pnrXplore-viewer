@@ -1,9 +1,7 @@
-
 import streamlit as st
 from manager import Manager
-import json
 
-#st.session_state["debug"] = True
+st.session_state["debug"] = False
 
 
 if "manager" not in st.session_state:
