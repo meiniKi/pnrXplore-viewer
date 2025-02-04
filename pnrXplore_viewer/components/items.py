@@ -3,7 +3,7 @@ import streamlit as st
 from pathlib import PosixPath
 from streamlit_elements import elements, mui, nivo, html
 from pydoc import locate
-from .helper import Helper
+from pnrXplore_viewer.utils.helper import Helper
 
 
 class Items:

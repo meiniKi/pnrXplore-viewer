@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import streamlit as st
 from pathlib import Path
-from pages import Factory
+from factory import Factory
 
 
 class Manager:
@@ -25,13 +25,13 @@ class Manager:
         if st.session_state.get("manger_uploaded_root", None) is not None:
             pages = [
                 st.Page(
-                    page="pages/page_hello_data.py",
+                    page="static/page_hello_data.py",
                     title="Hello",
                     icon="📊",
                     url_path="pg_hello_data",
                 ),
                 st.Page(
-                    page="pages/page_reset.py",
+                    page="static/page_reset.py",
                     title="Reset",
                     icon="⏏️",
                     url_path="pg_reset",
@@ -47,10 +47,10 @@ class Manager:
                     )
                 )
             pages.append(
-                st.Page("pages/page_interactive.py", title="Interactive", icon="💻")
+                st.Page("static/page_interactive.py", title="Interactive", icon="💻")
             )
         else:
-            pages = [st.Page("pages/page_upload.py")]
+            pages = [st.Page("static/page_upload.py")]
             # pages = [st.Page("page_nodes.py")]
         st.session_state.pages_generated = pages
 
@@ -59,16 +59,14 @@ class Manager:
             p := st.session_state.get("manger_uploaded_root", None)
         ) is not None and p in tempfile.gettempdir():
             shutil.rmtree(p)
-        st.session_state["manger_uploaded_root"] = None
-        # For debugging
-        # if st.session_state.get("debug", False):
-        #    st.session_state.manger_uploaded_root = Path("archives/run/").absolute()
-        #    self.__load_page_keys()
+
+        # TODO: is there a better way to handle these states?
+        del st.session_state["sel_quick_from_existing_folder_init"]
+        del st.session_state["manger_uploaded_root"]
         st.rerun()
 
     def run(self):
         pg = None
-        # if st.session_state.get("manger_pages_dict", None) is None:
         self.generate()
         pg = st.navigation(st.session_state.pages_generated)
         if pg.url_path == "pg_reset":

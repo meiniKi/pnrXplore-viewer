@@ -4,9 +4,9 @@ from streamlit_ace import st_ace
 from typing import Dict, List
 import streamlit as st
 import json
-from .components.controls import Controls
-from .components.items import Items
-from .temp
+from components.controls import Controls
+from components.items import Items
+from templates.templates import Templates
 
 
 class Factory:
@@ -35,7 +35,7 @@ class Factory:
     def __generate_template(
         template: str, data, page_root: PosixPath, page_generate_key: str
     ):
-        pass
+        getattr(Templates, template)(data, page_root, page_generate_key)
 
     @staticmethod
     def generate():
@@ -60,11 +60,11 @@ class Factory:
         st.title(data["title"])
 
         if data["type"] == "template":
-            template, data = data["template"]
+            template, data = data["data"]
             Factory.__generate_template(template, data, page_root, page_generate_key)
 
         elif data["type"] == "constructed":
-            components_dict = data["constructed"]
+            components_dict = data["data"]
             if "control" in components_dict:
                 Factory.__generate_controls(
                     components_dict["control"], page_root, page_generate_key
