@@ -46,6 +46,15 @@ class Manager:
                         default=False,
                     )
                 )
+            pages.append(
+                st.Page(
+                    page="static/page_debug.py",
+                    title="Viewer (experimental!)",
+                    url_path="viewer",
+                    default=False,
+                )
+            )
+
         else:
             pages = [st.Page("static/page_upload.py")]
             # pages = [st.Page("static/page_debug.py")]
