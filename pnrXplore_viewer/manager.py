@@ -46,12 +46,9 @@ class Manager:
                         default=False,
                     )
                 )
-            pages.append(
-                st.Page("static/page_interactive.py", title="Interactive", icon="💻")
-            )
         else:
             pages = [st.Page("static/page_upload.py")]
-            # pages = [st.Page("page_nodes.py")]
+            # pages = [st.Page("static/page_debug.py")]
         st.session_state.pages_generated = pages
 
     def reset(self):

@@ -130,3 +130,30 @@ class Templates:
                 with redirect_stdout(f):
                     exec(default_prexif + content)
                 st.markdown("```\n {} \n```".format(f.getvalue()))
+
+    @classmethod
+    def PnrXploreOverview(cls, data, page_root: PosixPath, page_generate_key: str):
+        import pandas as pd
+
+        st.markdown(
+            """<style> .block-container {
+                        padding-top:    0.8rem;
+                        padding-bottom: 0rem;
+                        padding-left:   5rem;
+                        padding-right:  5rem;
+                    } </style>""",
+            unsafe_allow_html=True,
+        )
+
+        for s in data[0]["sections"]:
+            df = pd.DataFrame(s["data"])
+            st.markdown("## {}".format(s["title"]))
+
+            cc = {}
+            for k, v in s["column_config"].items():
+                if type(v) == str:
+                    cc[k] = v
+                else:
+                    cc[k] = getattr(st.column_config, v[0])(v[1])
+
+            st.dataframe(df, hide_index=True, column_config=cc)
