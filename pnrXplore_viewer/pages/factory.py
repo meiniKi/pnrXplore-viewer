@@ -4,8 +4,9 @@ from streamlit_ace import st_ace
 from typing import Dict, List
 import streamlit as st
 import json
-from ..components.controls import Controls
-from ..components.items import Items
+from .components.controls import Controls
+from .components.items import Items
+from .temp
 
 
 class Factory:
@@ -21,27 +22,18 @@ class Factory:
         cols = st.columns(len(elements))
         for i, ele in enumerate(elements):
             with cols[i]:
-                if ele["type"] == "PnrXploreControlSliderSelect":
-                    Controls.PnrXploreControlSliderSelect(ele)
-                if ele["type"] == "PnrXploreControlBoxSelect":
-                    Controls.PnrXploreControlBoxSelect(ele)
-            # TODO: Add further control components here
+                getattr(Controls, ele["type"])(ele)
 
     def __generate_dashboard(items: List, page_root: PosixPath, page_generate_key: str):
         layout = [dashboard.Item(i=i["key"], **i["layout"]) for i in items]
         with elements(f"dashboard_{page_generate_key}"):
             with dashboard.Grid(layout):
                 for i in items:
-                    if i["item_type"] == "PnrXploreDashLine":
-                        Items.PnrXploreDashLine(i)
-                    if i["item_type"] == "PnrXploreDashStateImage":
-                        Items.PnrXploreDashStateImage(i, page_root)
-                    if i["item_type"] == "PnrXploreDashVideo":
-                        Items.PnrXploreDashVideo(i, page_root)
+                    getattr(Items, i["item_type"])(i, page_root)
 
     @staticmethod
     def __generate_template(
-        template: str, items: List, page_root: PosixPath, page_generate_key: str
+        template: str, data, page_root: PosixPath, page_generate_key: str
     ):
         pass
 
@@ -67,16 +59,17 @@ class Factory:
         )
         st.title(data["title"])
 
-        components_dict = data["components"]
-        if "controls" in components_dict:
-            Factory.__generate_controls(
-                components_dict["controls"], page_root, page_generate_key
-            )
-        if "dashboard" in components_dict:
-            Factory.__generate_dashboard(
-                components_dict["dashboard"], page_root, page_generate_key
-            )
-        if "template" in components_dict:
-            Factory.__generate_template(
-                components_dict["template"], page_root, page_generate_key
-            )
+        if data["type"] == "template":
+            template, data = data["template"]
+            Factory.__generate_template(template, data, page_root, page_generate_key)
+
+        elif data["type"] == "constructed":
+            components_dict = data["constructed"]
+            if "control" in components_dict:
+                Factory.__generate_controls(
+                    components_dict["control"], page_root, page_generate_key
+                )
+            if "dashboard" in components_dict:
+                Factory.__generate_dashboard(
+                    components_dict["dashboard"], page_root, page_generate_key
+                )

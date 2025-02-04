@@ -3,6 +3,8 @@ from typing import List
 import shutil
 import tempfile
 import streamlit as st
+from pathlib import Path
+from pages import Factory
 
 
 class Manager:
@@ -23,13 +25,16 @@ class Manager:
         if st.session_state.get("manger_uploaded_root", None) is not None:
             pages = [
                 st.Page(
-                    page="page_hello_data.py",
+                    page="pages/page_hello_data.py",
                     title="Hello",
                     icon="📊",
                     url_path="pg_hello_data",
                 ),
                 st.Page(
-                    page="page_reset.py", title="Reset", icon="⏏️", url_path="pg_reset"
+                    page="pages/page_reset.py",
+                    title="Reset",
+                    icon="⏏️",
+                    url_path="pg_reset",
                 ),
             ]
             for p in st.session_state.get("manger_pages_dict", []):
@@ -41,9 +46,11 @@ class Manager:
                         default=False,
                     )
                 )
-            pages.append(st.Page("page_interactive.py", title="Interactive", icon="💻"))
+            pages.append(
+                st.Page("pages/page_interactive.py", title="Interactive", icon="💻")
+            )
         else:
-            pages = [st.Page("page_upload.py")]
+            pages = [st.Page("pages/page_upload.py")]
             # pages = [st.Page("page_nodes.py")]
         st.session_state.pages_generated = pages
 
@@ -54,9 +61,9 @@ class Manager:
             shutil.rmtree(p)
         st.session_state["manger_uploaded_root"] = None
         # For debugging
-        if st.session_state.get("debug", False):
-            st.session_state.manger_uploaded_root = Path("archives/run/").absolute()
-            self.__load_page_keys()
+        # if st.session_state.get("debug", False):
+        #    st.session_state.manger_uploaded_root = Path("archives/run/").absolute()
+        #    self.__load_page_keys()
         st.rerun()
 
     def run(self):

@@ -2,33 +2,27 @@ from typing import Dict
 import streamlit as st
 from pathlib import PosixPath
 from streamlit_elements import elements, mui, nivo, html
-from helper import Helper
 from pydoc import locate
+from .helper import Helper
 
 
 class Items:
     @staticmethod
-    def PnrXploreDashLine(item: Dict):
-        marker_dict = {
-            "markers": [
-                {
-                    "axis": "x",
-                    "value": st.session_state.get("pstatic_sel_iter", 0),
-                    "lineStyle": {"stroke": "#aba803", "strokeWidth": 2},
-                    "legendOrientation": "vertical",
-                }
-            ]
-        }
+    def PnrXploreDashLine(item: Dict, page_root: PosixPath):
+        # Get values for markers
+        if "markers" in item["item_content"]:
+            for m in item["item_content"]["markers"]:
+                m["value"] = st.session_state.get(m["value"], 0)
 
         with elements(item["key"]):
             with mui.Box(key=item["key"]):
-                nivo.Line(**item["item_content"] | marker_dict)
+                nivo.Line(**item["item_content"])
 
     @staticmethod
     def PnrXploreDashStateImage(item: Dict, page_root: PosixPath):
         vals = tuple(
             [
-                locate(i[0])(st.session_state.get(i[1]))
+                locate(i[0])(st.session_state.get(i[1], 0))
                 for i in item["item_content"]["format_keys"]
             ]
         )
