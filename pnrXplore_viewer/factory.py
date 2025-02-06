@@ -64,7 +64,7 @@ class Factory:
             Factory.__generate_template(template, data, page_root, page_generate_key)
 
         elif data["type"] == "constructed":
-            components_dict = data["data"]
+            components_dict = data["components"]
             if "control" in components_dict:
                 Factory.__generate_controls(
                     components_dict["control"], page_root, page_generate_key

@@ -4,18 +4,19 @@ from PIL import Image, ImageDraw, ImageFont
 
 from pathlib import Path
 import zipfile
+import tarfile
 import shutil
 import tempfile
 import io
 
 
-def copy_to_proc_root(zip_file, from_buffer=False):
+def copy_to_proc_root(bundle_file, from_buffer=False):
     if from_buffer:
-        zip_buffer = io.BytesIO()
-        zip_buffer.write(zip_file.read())
-        zip_buffer.seek(0)
+        bundle_bfr = io.BytesIO()
+        bundle_bfr.write(bundle_file.read())
+        bundle_bfr.seek(0)
     else:
-        zip_buffer = zip_file
+        bundle_bfr = bundle_file
 
     if (f := st.session_state.get("manger_uploaded_root", None)) is not None:
         shutil.rmtree(f)
@@ -23,16 +24,33 @@ def copy_to_proc_root(zip_file, from_buffer=False):
 
     tf = tempfile.mkdtemp()
     st.session_state["manger_uploaded_root"] = tf
-    zf = zipfile.ZipFile(zip_buffer)
-    zf.extractall(tf)
+    st.session_state["manger_uploaded_name"] = Path(bundle_file).stem
+
+    suffix = Path(bundle_file).suffix
+    if suffix == ".zip":
+        zf = zipfile.ZipFile(bundle_bfr)
+        zf.extractall(tf)
+    elif suffix == ".tar":
+        if from_buffer:
+            bundle_bfr.extractall(path=tf)
+        else:
+            with tarfile.open(bundle_file, "r") as tar:
+                tar.extractall(path=tf)
+    else:
+        raise ValueError("Invalid suffix for bundle.")
+
     st.rerun()
 
 
 def load_from_existing(name: str):
     if st.session_state.get("debug", False):
-        st.session_state["manger_uploaded_root"] = f"./archives/{name}"
+        st.session_state["manger_uploaded_root"] = "./archives/{}".format(
+            Path(name).stem
+        )
+        st.session_state["manger_uploaded_name"] = Path(name).stem
         st.rerun()
-    copy_to_proc_root((Path("./archives") / Path(name).with_suffix(".zip")).absolute())
+    st.session_state["manger_uploaded_name"] = Path(name).stem
+    copy_to_proc_root((Path("./archives") / Path(name)).absolute())
 
 
 def render_text_to_image(text, image_size=256, max_lines=4, initial_font_size=40):
@@ -77,7 +95,14 @@ uploaded_archive = st.file_uploader(
 
 st.divider()
 bundles = list(
-    {str(file.stem) for file in Path("./archives").rglob("*.zip") if file.is_file()}
+    {
+        str(file.name)
+        for file in (
+            list(Path("./archives").rglob("*.zip"))
+            + list(Path("./archives").rglob("*.tar"))
+        )
+        if file.is_file()
+    }
 )
 
 sel_bundle_quick = image_select(

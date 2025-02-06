@@ -135,6 +135,21 @@ class Templates:
     def PnrXploreOverview(cls, data, page_root: PosixPath, page_generate_key: str):
         import pandas as pd
 
+        def Table(title, data, column_config, **kwargs):
+            df = pd.DataFrame(data)
+            st.markdown("## {}".format(title))
+            cc = {}
+            for k, v in column_config.items():
+                if type(v) == str:
+                    cc[k] = v
+                else:
+                    cc[k] = getattr(st.column_config, v[0])(v[1])
+
+            st.dataframe(df, hide_index=True, column_config=cc)
+
+        def Markdown(md, **kwargs):
+            st.markdown(md)
+
         st.markdown(
             """<style> .block-container {
                         padding-top:    0.8rem;
@@ -146,14 +161,4 @@ class Templates:
         )
 
         for s in data[0]["sections"]:
-            df = pd.DataFrame(s["data"])
-            st.markdown("## {}".format(s["title"]))
-
-            cc = {}
-            for k, v in s["column_config"].items():
-                if type(v) == str:
-                    cc[k] = v
-                else:
-                    cc[k] = getattr(st.column_config, v[0])(v[1])
-
-            st.dataframe(df, hide_index=True, column_config=cc)
+            locals()[s["id"]](**s)

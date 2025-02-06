@@ -1,4 +1,3 @@
-
 import streamlit as st
 from streamlit_ace import st_ace
 import json
@@ -12,18 +11,22 @@ import numpy as np
 def get_pages():
     return st.session_state.get("manger_pages_dict", [])
 
+
 def get_page_data(page: str):
     if (p := st.session_state.get("manger_uploaded_root", None)) is not None:
-        with open(Path(p)/page/"data.json") as f:
+        with open(Path(p) / page / "data.json") as f:
             return json.load(f)
 
 
-st.markdown("""<style> .block-container {
+st.markdown(
+    """<style> .block-container {
                 padding-top:    0.8rem;
                 padding-bottom: 0rem;
                 padding-left:   5rem;
                 padding-right:  5rem;
-            } </style>""", unsafe_allow_html=True)
+            } </style>""",
+    unsafe_allow_html=True,
+)
 st.title("Interactive Data Explorer")
 
 cedit, cplot = st.columns(2)
@@ -70,8 +73,8 @@ with cplot:
             exec(default_prexif + content)
         st.markdown("```\n {} \n```".format(f.getvalue()))
 
-        #arr = np.random.normal(1, 1, size=100)
-        #fig, ax = plt.subplots()
-        #ax.hist(arr, bins=20)
+        # arr = np.random.normal(1, 1, size=100)
+        # fig, ax = plt.subplots()
+        # ax.hist(arr, bins=20)
 #
-        #st.pyplot(fig)
+# st.pyplot(fig)

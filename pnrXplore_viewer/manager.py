@@ -5,6 +5,7 @@ import tempfile
 import streamlit as st
 from pathlib import Path
 from factory import Factory
+from download import Download
 
 
 class Manager:
@@ -54,11 +55,41 @@ class Manager:
                     default=False,
                 )
             )
-
+            with st.sidebar:
+                if st.button("💾 Download", use_container_width=True):
+                    self.download()
         else:
             pages = [st.Page("static/page_upload.py")]
             # pages = [st.Page("static/page_debug.py")]
         st.session_state.pages_generated = pages
+
+    @st.dialog("file", width="large")
+    def download(self):
+        st.selectbox(
+            label="Select Format", key="sel_download_format", options=[".tar", ".zip"]
+        )
+        # Until this issue is resolve, there is a 2-way step to create the archive
+        # and then download it
+        # https://github.com/streamlit/streamlit/issues/5053
+        st.markdown("Note: 2-step process until streamlit/issues/5053 is resolved")
+        path = None
+        if st.button("1) Click me to create the archive"):
+            with st.spinner(""):
+                buffer = Download.create_archive()
+                path = Path("./archives") / (
+                    "latest_download" + st.session_state["sel_download_format"]
+                )
+                with open(path, "wb") as f:
+                    f.write(buffer.getbuffer())
+        if path:
+            with open(path, "rb") as f:
+                st.download_button(
+                    label="2) Now, click me to download",
+                    data=f,
+                    file_name=st.session_state["manger_uploaded_name"]
+                    + st.session_state["sel_download_format"],
+                    mime="application/zip",
+                )
 
     def reset(self):
         if (
