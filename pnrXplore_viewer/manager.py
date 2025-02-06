@@ -31,12 +31,6 @@ class Manager:
                     icon="📊",
                     url_path="pg_hello_data",
                 ),
-                st.Page(
-                    page="static/page_reset.py",
-                    title="Reset",
-                    icon="⏏️",
-                    url_path="pg_reset",
-                ),
             ]
             for p in st.session_state.get("manger_pages_dict", []):
                 pages.append(
@@ -56,6 +50,8 @@ class Manager:
                 )
             )
             with st.sidebar:
+                if st.button("⏏️ Reset", use_container_width=True):
+                    self.reset()
                 if st.button("💾 Download", use_container_width=True):
                     self.download()
         else:
@@ -106,7 +102,5 @@ class Manager:
         pg = None
         self.generate()
         pg = st.navigation(st.session_state.pages_generated)
-        if pg.url_path == "pg_reset":
-            self.reset()
         st.session_state.page_generate_key = pg.url_path
         pg.run()
