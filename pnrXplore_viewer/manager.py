@@ -6,6 +6,7 @@ import streamlit as st
 from pathlib import Path
 from factory import Factory
 from download import Download
+from config import Config
 
 
 class Manager:
@@ -28,7 +29,7 @@ class Manager:
                 st.Page(
                     page="static/page_hello_data.py",
                     title="Hello",
-                    icon="📊",
+                    icon="👋",
                     url_path="pg_hello_data",
                 ),
             ]
@@ -72,7 +73,7 @@ class Manager:
         if st.button("1) Click me to create the archive"):
             with st.spinner(""):
                 buffer = Download.create_archive()
-                path = Path("./archives") / (
+                path = Config.BUNDLES_DIR / (
                     "latest_download" + st.session_state["sel_download_format"]
                 )
                 with open(path, "wb") as f:

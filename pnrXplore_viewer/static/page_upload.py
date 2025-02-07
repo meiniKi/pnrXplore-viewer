@@ -8,6 +8,7 @@ import tarfile
 import shutil
 import tempfile
 import io
+from pnrXplore_viewer.config import Config
 
 
 def copy_to_proc_root(bundle_file, from_buffer=False):
@@ -44,13 +45,11 @@ def copy_to_proc_root(bundle_file, from_buffer=False):
 
 def load_from_existing(name: str):
     if st.session_state.get("debug", False):
-        st.session_state["manger_uploaded_root"] = "./archives/{}".format(
-            Path(name).stem
-        )
+        st.session_state["manger_uploaded_root"] = Config.BUNDLES_DIR / Path(name).stem
         st.session_state["manger_uploaded_name"] = Path(name).stem
         st.rerun()
     st.session_state["manger_uploaded_name"] = Path(name).stem
-    copy_to_proc_root((Path("./archives") / Path(name)).absolute())
+    copy_to_proc_root((Config.BUNDLES_DIR / Path(name)).absolute())
 
 
 def render_text_to_image(text, image_size=256, max_lines=4, initial_font_size=40):
@@ -98,8 +97,8 @@ bundles = list(
     {
         str(file.name)
         for file in (
-            list(Path("./archives").rglob("*.zip"))
-            + list(Path("./archives").rglob("*.tar"))
+            list(Config.BUNDLES_DIR.rglob("*.zip"))
+            + list(Config.BUNDLES_DIR.rglob("*.tar"))
         )
         if file.is_file()
     }
@@ -127,9 +126,7 @@ sel_bundle = st.selectbox(
 
 if st.button("Analyze"):
     if st.session_state.get("debug", False):
-        st.session_state["manger_uploaded_root"] = (
-            "/home/user/Documents/repos/pnrXplore-viewer/archives/run"
-        )
+        st.session_state["manger_uploaded_root"] = Config.BUNDLES_DIR / "debug"
         st.rerun()
 
     if uploaded_archive is not None:
