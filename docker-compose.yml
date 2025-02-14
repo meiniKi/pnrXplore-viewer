@@ -1,0 +1,14 @@
+
+services:
+  pnrxplore-viewer:
+    build: .
+    image: pnrxplore/pnrxplore-viewer:latest
+    ports:
+      - 8501:8501
+    volumes:
+      -   ${BUNDLE_DIR:-./bundles}:/app/bundles
+
+volumes:
+  data_volume:
+
+

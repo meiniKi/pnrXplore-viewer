@@ -42,14 +42,6 @@ class Manager:
                         default=False,
                     )
                 )
-            pages.append(
-                st.Page(
-                    page="static/page_debug.py",
-                    title="Viewer (experimental!)",
-                    url_path="viewer",
-                    default=False,
-                )
-            )
             with st.sidebar:
                 if st.button("⏏️ Reset", use_container_width=True):
                     self.reset()

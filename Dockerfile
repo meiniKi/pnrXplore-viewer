@@ -10,9 +10,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install -r requirements.txt
+RUN pip install -e .
 
 EXPOSE 8501
-ENV NAME=pnrXplore-viewer
+ENV NAME=pnrxplore-viewer
 
-CMD ["streamlit", "run", "pnrXplore-viewer/app.py"]
+CMD ["streamlit", "run", "/app/pnrXplore_viewer/pnrXplore.py"]

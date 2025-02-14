@@ -28,6 +28,7 @@ class Templates:
 
     @classmethod
     def PnrXploreNotes(cls, data, page_root: PosixPath, page_generate_key: str):
+        """Template"""
         from streamlit_ace import st_ace
 
         def __load_markdown(data):
@@ -70,6 +71,8 @@ class Templates:
 
     @classmethod
     def PnrXplorePlayground(cls, data, page_root: PosixPath, page_generate_key: str):
+        """Template for a Python playground page. Notes that this is highly insecure in
+        unrusted environments. Requires sandboxing."""
         from streamlit_ace import st_ace
         from contextlib import redirect_stdout
         import matplotlib.pyplot as plt
@@ -93,7 +96,7 @@ class Templates:
 
         st.markdown(
             """<style> .block-container {
-                        padding-top:    0.8rem;
+                        padding-top:    1.5rem;
                         padding-bottom: 0rem;
                         padding-left:   5rem;
                         padding-right:  5rem;
@@ -152,7 +155,7 @@ class Templates:
 
         st.markdown(
             """<style> .block-container {
-                        padding-top:    0.8rem;
+                        padding-top:    1.5rem;
                         padding-bottom: 0rem;
                         padding-left:   5rem;
                         padding-right:  5rem;
@@ -162,3 +165,21 @@ class Templates:
 
         for s in data[0]["sections"]:
             locals()[s["id"]](**s)
+
+    @classmethod
+    def PnrXploreNextpnrViewer(cls, data, page_root: PosixPath, page_generate_key: str):
+        from nextpnr_viewer import nextpnr_viewer
+
+        st.write("Loading can take some time ...")
+
+        s = ""
+        with open(page_root / data[0]["json_file"], "r") as f:
+            s = f.read()
+
+        nextpnr_viewer(
+            family=data[0]["family"],
+            device=data[0]["device"],
+            width=1000,
+            height=500,
+            routed_json=s,
+        )
