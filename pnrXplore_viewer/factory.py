@@ -10,6 +10,9 @@ from templates.templates import Templates
 
 
 class Factory:
+    """Page factory to generate pages dynamically based on the
+    data provided in the loaded bundle."""
+
     @staticmethod
     def __load_page_data(data_key: str, path: PosixPath):
         with open(path) as f:

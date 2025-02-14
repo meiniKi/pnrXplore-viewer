@@ -10,8 +10,11 @@ from config import Config
 
 
 class Manager:
+    """Manages the shown pages. Initially, the page to select or upload a bundle is shown.
+    Once a bundle is provided, all generated pages are displayed. Also, it handles
+    resetting a bundle and downloading it via the browser."""
+
     def __init__(self) -> None:
-        # self.reset()
         st.set_page_config(
             page_title="pnrXplore", layout="wide", initial_sidebar_state="collapsed"
         )
@@ -49,7 +52,6 @@ class Manager:
                     self.download()
         else:
             pages = [st.Page("static/page_upload.py")]
-            # pages = [st.Page("static/page_debug.py")]
         st.session_state.pages_generated = pages
 
     @st.dialog("file", width="large")

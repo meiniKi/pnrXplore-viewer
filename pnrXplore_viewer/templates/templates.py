@@ -8,8 +8,13 @@ from io import StringIO
 
 
 class Templates:
+    """Page templates. Each template in the bundle is created by a method of
+    the same name. The parameters are standardized to the page's data,
+    the page root directory, and the key."""
+
     @classmethod
     def PnrXploreCinema(cls, data, page_root: PosixPath, page_generate_key: str):
+        """Page dedicated to providing a collection of animated renderings as videos."""
         from streamlit_elements import elements, media
 
         k = "{}_video_select".format(page_root.name)
@@ -28,7 +33,7 @@ class Templates:
 
     @classmethod
     def PnrXploreNotes(cls, data, page_root: PosixPath, page_generate_key: str):
-        """Template"""
+        """A page with markdown notes and interactive editor."""
         from streamlit_ace import st_ace
 
         def __load_markdown(data):
@@ -136,6 +141,7 @@ class Templates:
 
     @classmethod
     def PnrXploreOverview(cls, data, page_root: PosixPath, page_generate_key: str):
+        """A page dedicated to providing a summary of the most relevant data."""
         import pandas as pd
 
         def Table(title, data, column_config, **kwargs):
@@ -168,6 +174,9 @@ class Templates:
 
     @classmethod
     def PnrXploreNextpnrViewer(cls, data, page_root: PosixPath, page_generate_key: str):
+        """A page embedding the nextpnr viewer to visualize the target
+        FPGA architecture and implemented design."""
+
         from nextpnr_viewer import nextpnr_viewer
 
         st.write("Loading can take some time ...")
