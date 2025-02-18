@@ -1,9 +1,14 @@
 import os
 import streamlit as st
 from manager import Manager
+from config import Config
 
-st.session_state["debug"] = os.environ.get("PNRXPLORE_DEBUG", False)
+# Apply configs to streamlit before starting the manager
+#
+Config.apply()
 
+# Start the manager
+#
 if "manager" not in st.session_state:
     st.session_state.manager = Manager()
 

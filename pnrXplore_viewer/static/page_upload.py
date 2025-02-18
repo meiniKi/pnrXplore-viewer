@@ -1,17 +1,22 @@
-import streamlit as st
-from streamlit_image_select import image_select
-from PIL import Image, ImageDraw, ImageFont
-
-from pathlib import Path
+import io
 import zipfile
 import tarfile
 import shutil
 import tempfile
-import io
+import itertools
+
+from glob import glob
+import streamlit as st
+from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
+from streamlit_image_select import image_select
 from pnrXplore_viewer.config import Config
 
 
 def copy_to_proc_root(bundle_file, from_buffer=False):
+    """Copy a bundle to the process root, i.e., the temporary folder.
+    It can either be loaded from a bundle for or from a buffer if it was
+    uploaded via the upload component."""
     if from_buffer:
         bundle_bfr = io.BytesIO()
         bundle_bfr.write(bundle_file.read())
@@ -43,7 +48,8 @@ def copy_to_proc_root(bundle_file, from_buffer=False):
     st.rerun()
 
 
-def load_from_existing(name: str):
+def load_from_existing(name: str) -> None:
+    """Load an existing bundle from BUNDLES_DIR by bame"""
     if st.session_state.get("debug", False):
         st.session_state["manger_uploaded_root"] = Config.BUNDLES_DIR / Path(name).stem
         st.session_state["manger_uploaded_name"] = Path(name).stem
@@ -52,7 +58,10 @@ def load_from_existing(name: str):
     copy_to_proc_root((Config.BUNDLES_DIR / Path(name)).absolute())
 
 
-def render_text_to_image(text, image_size=256, max_lines=4, initial_font_size=40):
+def render_text_to_image(
+    text: str, image_size=256, max_lines=4, initial_font_size=40
+) -> Image:
+    """Render the preview image for Quick Links if no accompanying image is provided."""
     image = Image.new("RGB", (image_size, image_size), "#0E1117")
     draw = ImageDraw.Draw(image)
     font = ImageFont.load_default()
@@ -86,9 +95,25 @@ def render_text_to_image(text, image_size=256, max_lines=4, initial_font_size=40
     return image
 
 
-st.title("Upload or Select pnrXplor Archive")
+def image_for_bundle(bundle: str) -> Image:
+    """Get image for a bundle name; either by loading the accompanying image or by
+    generating an image with the bundle name."""
+    supported_types = [ext for ext, fmt in Image.registered_extensions().items()]
 
-uploaded_archive = st.file_uploader(
+    basename = Config.BUNDLES_DIR / Path(bundle).stem
+    images = list(
+        itertools.chain(
+            *[list(glob(f"{basename}{suffix}") for suffix in supported_types)][0]
+        )
+    )
+    if len(images) == 0:
+        return render_text_to_image(bundle)
+    return Image.open(images[0]).convert("RGB")
+
+
+st.title("Upload or Select pnrXplor Bundle")
+
+uploaded_bundle = st.file_uploader(
     label="Upload an archvie", label_visibility="hidden", accept_multiple_files=False
 )
 
@@ -106,13 +131,15 @@ bundles = list(
 
 sel_bundle_quick = image_select(
     "Quick Links",
-    [render_text_to_image(b) for b in bundles],
+    [image_for_bundle(b) for b in sorted(bundles)],
     use_container_width=False,
     return_value="index",
     key="sel_quick_from_existing_folder",
 )
 
 if not "sel_quick_from_existing_folder_init" in st.session_state:
+    # The components automatically selects the first item when loading
+    # the page; this prevents automatically selecting the first bundle
     st.session_state["sel_quick_from_existing_folder_init"] = True
 else:
     load_from_existing(bundles[sel_bundle_quick])
@@ -129,7 +156,7 @@ if st.button("Analyze"):
         st.session_state["manger_uploaded_root"] = Config.BUNDLES_DIR / "debug"
         st.rerun()
 
-    if uploaded_archive is not None:
-        copy_to_proc_root(uploaded_archive, True)
+    if uploaded_bundle is not None:
+        copy_to_proc_root(uploaded_bundle, True)
     else:
         load_from_existing(st.session_state.get("sel_from_existing_folder"))

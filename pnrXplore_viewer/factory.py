@@ -7,6 +7,7 @@ import json
 from components.controls import Controls
 from components.items import Items
 from templates.templates import Templates
+from config import Config
 
 
 class Factory:
@@ -14,8 +15,8 @@ class Factory:
     data provided in the loaded bundle."""
 
     @staticmethod
-    def __load_page_data(data_key: str, path: PosixPath):
-        with open(path) as f:
+    def __load_page_data(page_root: PosixPath):
+        with open(page_root / Config.PAGE_DATA_FILE) as f:
             st.session_state.data_key = json.load(f)
 
     @staticmethod
@@ -42,12 +43,13 @@ class Factory:
 
     @staticmethod
     def generate():
+        """Generate the page content for the page stored in page_generate_key."""
         page_generate_key = st.session_state.page_generate_key
         page_root = Path(st.session_state.manger_uploaded_root) / page_generate_key
-        data_key = f"{page_generate_key}_data"
+        # data_key = f"{page_generate_key}_data"
         if not page_generate_key in st.session_state:
             st.session_state.page_generate_key = True
-            Factory.__load_page_data(data_key, page_root / "data.json")
+            Factory.__load_page_data(page_root)
 
         data = st.session_state.data_key
 
@@ -62,6 +64,7 @@ class Factory:
         )
         st.title(data["title"])
 
+        # Differentiate between templated pages and constructed pages
         if data["type"] == "template":
             template, data = data["data"]
             Factory.__generate_template(template, data, page_root, page_generate_key)
