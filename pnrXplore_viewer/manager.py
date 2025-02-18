@@ -21,11 +21,14 @@ class Manager:
 
     @staticmethod
     def __load_index():
+        """Load bundle index json into st.manger_pages_dict."""
         if (p := st.session_state.get("manger_uploaded_root", None)) is not None:
-            with open(Path(p) / "index.json") as f:
+            with open(Path(p) / Config.PAGE_INDEX_FILE) as f:
                 st.session_state.manger_pages_dict = json.load(f)
 
     def generate(self) -> List:
+        """Generate all pages to be shown. Either the welcome page for uploads or
+        pages according to allocations in the bundle."""
         self.__load_index()
         if st.session_state.get("manger_uploaded_root", None) is not None:
             pages = [
@@ -68,7 +71,8 @@ class Manager:
             with st.spinner(""):
                 buffer = Download.create_archive()
                 path = Config.BUNDLES_DIR / (
-                    "latest_download" + st.session_state["sel_download_format"]
+                    Config.FILENAME_BASE_DOWNLAOD
+                    + st.session_state["sel_download_format"]
                 )
                 with open(path, "wb") as f:
                     f.write(buffer.getbuffer())
@@ -83,6 +87,7 @@ class Manager:
                 )
 
     def reset(self):
+        """Reset to the welcome page; includes removing temporarily creates files."""
         if (
             p := st.session_state.get("manger_uploaded_root", None)
         ) is not None and p in tempfile.gettempdir():
@@ -94,8 +99,11 @@ class Manager:
         st.rerun()
 
     def run(self):
+        """Main function to run the manager."""
         pg = None
         self.generate()
         pg = st.navigation(st.session_state.pages_generated)
+        # page_generate_key stores the currently displayed page
+        # Thus, only this page needs to be rendered
         st.session_state.page_generate_key = pg.url_path
         pg.run()
