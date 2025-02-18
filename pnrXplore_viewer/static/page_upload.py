@@ -131,7 +131,7 @@ bundles = list(
 
 sel_bundle_quick = image_select(
     "Quick Links",
-    [image_for_bundle(b) for b in bundles],
+    [image_for_bundle(b) for b in sorted(bundles)],
     use_container_width=False,
     return_value="index",
     key="sel_quick_from_existing_folder",
