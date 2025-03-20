@@ -15,4 +15,4 @@ RUN pip install -e .
 EXPOSE 8501
 ENV NAME=pnrxplore-viewer
 
-CMD ["streamlit", "run", "/app/pnrXplore_viewer/pnrXplore.py"]
+CMD ["streamlit", "run", "/app/pnrXplore_viewer/pnrXplore.py", "--server.maxUploadSize", "2048"]

@@ -4,6 +4,7 @@ import streamlit as st
 
 
 class Config:
+    """Viewer configurations."""
     # When the debug flag is set, data will be taken from a folder called _debug_
     # in the _bundles_ directory. This directory shall contain the uncompressed bundle.
     # Thus, faster debug iterations are possible. Note that no copy of the data is taken.

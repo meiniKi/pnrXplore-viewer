@@ -9,6 +9,7 @@ from pnrXplore_viewer.utils.helper import Helper
 class Items:
     @staticmethod
     def PnrXploreDashLine(item: Dict, page_root: PosixPath):
+        """Line plot dashboard item. Currently restricted to a subset of options available in the viewer."""
         # Get values for markers
         if "markers" in item["item_content"]:
             for m in item["item_content"]["markers"]:
@@ -20,6 +21,7 @@ class Items:
 
     @staticmethod
     def PnrXploreDashStateImage(item: Dict, page_root: PosixPath):
+        """Dashboard item to display an image of a certain state, e.g., the current placement solution"""
         vals = tuple(
             [
                 locate(i[0])(st.session_state.get(i[1], 0))

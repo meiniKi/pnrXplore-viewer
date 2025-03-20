@@ -1,6 +1,9 @@
 # pnrXplore-viewer
 
-pnrXplore-viewer is a Web-based viewer for bundles created with pnrXplore. It can be run natively or in a Docker container.
+pnrXplore-viewer is a Web-based viewer for bundles created with [pnrXplore](https://github.com/meiniKi/pnrXplore). It can be run natively or in a Docker container.
+
+> [!TIP]
+> More information can be found [here](https://github.com/meiniKi/pnrXplore).
 
 ## Quick Start
 
@@ -10,8 +13,10 @@ pnrXplore-viewer is a Web-based viewer for bundles created with pnrXplore. It ca
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
-streamlit run pnrXplore_viewer/pnrXplore.py
+streamlit run pnrXplore_viewer/pnrXplore.py --server.maxUploadSize 2048
 ```
+
+`--server.maxUploadSize` allows to set the maximum size of a bundle that can be uploaded. This is especially important when pnrXplore is locally hosted to quickly inspect very large bundle sizes.
 
 ### Run in Docker Container
 

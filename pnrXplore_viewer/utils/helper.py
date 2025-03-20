@@ -1,8 +1,8 @@
 import base64
 import streamlit as st
 
-
 class Helper:
+    """Collection of helper functions."""
     @staticmethod
     def image_path_to_base64(image_path):
         try:
