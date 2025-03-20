@@ -13,34 +13,30 @@ from streamlit_image_select import image_select
 from pnrXplore_viewer.config import Config
 
 
-def copy_to_proc_root(bundle_file, from_buffer=False):
+def copy_to_proc_root(bundle, from_upload=False):
     """Copy a bundle to the process root, i.e., the temporary folder.
     It can either be loaded from a bundle for or from a buffer if it was
     uploaded via the upload component."""
-    if from_buffer:
-        bundle_bfr = io.BytesIO()
-        bundle_bfr.write(bundle_file.read())
-        bundle_bfr.seek(0)
-    else:
-        bundle_bfr = bundle_file
-
     if (f := st.session_state.get("manger_uploaded_root", None)) is not None:
         shutil.rmtree(f)
         st.session_state["manger_pages_keys"] = None
 
     tf = tempfile.mkdtemp()
     st.session_state["manger_uploaded_root"] = tf
-    st.session_state["manger_uploaded_name"] = Path(bundle_file).stem
+    st.session_state["manger_uploaded_name"] = (
+        Path(bundle.name).stem if from_upload else Path(bundle).stem
+    )
 
-    suffix = Path(bundle_file).suffix
+    suffix = Path(bundle.name).suffix if from_upload else Path(bundle).suffix
     if suffix == ".zip":
-        zf = zipfile.ZipFile(bundle_bfr)
+        zf = zipfile.ZipFile(bundle.getvalue() if from_upload else bundle)
         zf.extractall(tf)
     elif suffix == ".tar":
-        if from_buffer:
-            bundle_bfr.extractall(path=tf)
+        if from_upload:
+            with tarfile.open(fileobj=io.BytesIO(bundle.getvalue())) as tar:
+                tar.extractall(path=tf)
         else:
-            with tarfile.open(bundle_file, "r") as tar:
+            with tarfile.open(bundle, "r") as tar:
                 tar.extractall(path=tf)
     else:
         raise ValueError("Invalid suffix for bundle.")
@@ -117,6 +113,9 @@ uploaded_bundle = st.file_uploader(
     label="Upload an archvie", label_visibility="hidden", accept_multiple_files=False
 )
 
+if uploaded_bundle is not None:
+    copy_to_proc_root(uploaded_bundle, True)
+
 st.divider()
 bundles = list(
     {
@@ -129,34 +128,33 @@ bundles = list(
     }
 )
 
-sel_bundle_quick = image_select(
-    "Quick Links",
-    [image_for_bundle(b) for b in sorted(bundles)],
-    use_container_width=False,
-    return_value="index",
-    key="sel_quick_from_existing_folder",
-)
+if len(bundles) > 0:
+    sel_bundle_quick = image_select(
+        "Quick Links",
+        [image_for_bundle(b) for b in sorted(bundles)],
+        use_container_width=False,
+        return_value="index",
+        key="sel_quick_from_existing_folder",
+    )
 
-if not "sel_quick_from_existing_folder_init" in st.session_state:
-    # The components automatically selects the first item when loading
-    # the page; this prevents automatically selecting the first bundle
-    st.session_state["sel_quick_from_existing_folder_init"] = True
-else:
-    load_from_existing(bundles[sel_bundle_quick])
-
-sel_bundle = st.selectbox(
-    label="Or Select from Default Folder",
-    key="sel_from_existing_folder",
-    options=bundles,
-)
-
-
-if st.button("Analyze"):
-    if st.session_state.get("debug", False):
-        st.session_state["manger_uploaded_root"] = Config.BUNDLES_DIR / "debug"
-        st.rerun()
-
-    if uploaded_bundle is not None:
-        copy_to_proc_root(uploaded_bundle, True)
+    if not "sel_quick_from_existing_folder_init" in st.session_state:
+        # The components automatically selects the first item when loading
+        # the page; this prevents automatically selecting the first bundle
+        st.session_state["sel_quick_from_existing_folder_init"] = True
     else:
-        load_from_existing(st.session_state.get("sel_from_existing_folder"))
+        load_from_existing(bundles[sel_bundle_quick])
+
+    sel_bundle = st.selectbox(
+        label="Or Select from Default Folder",
+        key="sel_from_existing_folder",
+        options=bundles,
+    )
+
+    if st.button("Analyze"):
+        if st.session_state.get("debug", False):
+            st.session_state["manger_uploaded_root"] = Config.BUNDLES_DIR / "debug"
+            st.rerun()
+        if uploaded_bundle is not None:
+            copy_to_proc_root(uploaded_bundle, True)
+        else:
+            load_from_existing(st.session_state.get("sel_from_existing_folder"))
