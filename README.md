@@ -1,4 +1,4 @@
-# pnrXplore-viewer
+#  ![](./pnrXplore.ico) pnrXplore-viewer
 
 pnrXplore-viewer is a Web-based viewer for bundles created with [pnrXplore](https://github.com/meiniKi/pnrXplore). It can be run natively or in a Docker container.
 
