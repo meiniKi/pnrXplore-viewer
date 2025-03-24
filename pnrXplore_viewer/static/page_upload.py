@@ -107,10 +107,10 @@ def image_for_bundle(bundle: str) -> Image:
     return Image.open(images[0]).convert("RGB")
 
 
-st.title("Upload or Select pnrXplor Bundle")
+st.title("Upload or Select pnrXplore Bundle")
 
 uploaded_bundle = st.file_uploader(
-    label="Upload an archvie", label_visibility="hidden", accept_multiple_files=False
+    label="Upload an archive", label_visibility="hidden", accept_multiple_files=False
 )
 
 if uploaded_bundle is not None:
