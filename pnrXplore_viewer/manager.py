@@ -16,7 +16,10 @@ class Manager:
 
     def __init__(self) -> None:
         st.set_page_config(
-            page_title="pnrXplore", layout="wide", initial_sidebar_state="collapsed"
+            page_title="pnrXplore",
+            layout="wide",
+            initial_sidebar_state="collapsed",
+            page_icon="./pnrXplore.ico"
         )
 
     @staticmethod
