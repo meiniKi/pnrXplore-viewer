@@ -22,20 +22,46 @@ class Items:
     @staticmethod
     def PnrXploreDashStateImage(item: Dict, page_root: PosixPath):
         """Dashboard item to display an image of a certain state, e.g., the current placement solution"""
-        vals = tuple(
-            [
-                locate(i[0])(st.session_state.get(i[1], 0))
-                for i in item["item_content"]["format_keys"]
-            ]
-        )
+
+        vals = list()
+        for i in item["item_content"]["format_keys"]:
+            if isinstance(i[0], list):
+                for t in i[0]:
+                    t = locate(t)
+                    try:
+                        v = t(st.session_state.get(i[1], t()))
+                        vals.append(v)
+                        break
+                    except (ValueError, TypeError):
+                        continue
+            else:
+                vals.append(locate(i[0])(st.session_state.get(i[1], 0)))
+
+        assert len(vals) == len(
+            item["item_content"]["format_keys"]
+        ), "Any type has not been found."
+        vals = tuple(vals)
+
+        if isinstance(item["item_content"]["relpath_template"], list):
+            for fmt in item["item_content"]["relpath_template"]:
+                try:
+                    if "%" in fmt:
+                        result = fmt % vals
+                    else:
+                        result = fmt.format(*vals)
+                    break
+                except (TypeError, ValueError) as e:
+                    continue
+            else:
+                raise TypeError
+        else:
+            result = item["item_content"]["relpath_template"] % vals
+
         with mui.Paper(key=item["key"]):
             with mui.Typography:
                 html.img(
                     src="data:image/png;base64,{}".format(
-                        Helper.image_path_to_base64(
-                            page_root
-                            / (item["item_content"]["relpath_template"] % vals)
-                        )
+                        Helper.image_path_to_base64(page_root / result)
                     ),
                     style={"width": "100%", "height": "auto", "display": "block"},
                 )
